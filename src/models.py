@@ -21,15 +21,29 @@ class User(db.Model):
         }
 
     #Función para mostrar todos los usurios
-    def get_all():
-        users = User.query.all()
-        users_dictionary = list(map(lambda x: x.to_dict(), users))
-        return users_dictionary
+    @classmethod
+    def get_all(cls):
+        users = cls.query.all()
+        
+        return [user.to_dict() for user in users] #Por cada elemento que hay en "users" conviertemelo en diccionionario (def to_dict()) 
+        #Aquí user = elemento del for "element"
+
     #Función para mostar los emails de los usuarios
-    def get_by_email(email):
-        user = User.query.filter_by(email=email)
-        user_dictionary = list(map(lambda x: x.to_dict(), user))
-        return user_dictionary
+    @classmethod
+    def get_by_email(cls, email):
+        user = cls.query.filter_by(email=email).one_or_none()
+    
+        return user.to_dict() if user else None #Si hay un "user" traémelo con diccionario filtrando el email sino devuélveme None
+    
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
+        return self.to_dict() #este es el new_user del main en la línea 83
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return self.to_dict()
 
 
 class Todo(db.Model):
@@ -53,16 +67,17 @@ class Todo(db.Model):
         }
 
 #ahora tienes que crear tu funcion "get_all()" para que puedas mostrar todos en la tabla de Todo
-
-    def get_all():
-        todos = Todo.query.all()
-        todos_dictionary = list(map(lambda x: x.to_dict(), todos))
-        return todos_dictionary
-
-    def get_by_user_id(user_id):
-        todo = Todo.query.filter_by(user_id=user_id)
-        todo_dictionary = list(map(lambda x: x.to_dict(), todo))
-        return todo_dictionary
+    @classmethod
+    def get_all(cls):
+        todos = cls.query.all()
+       
+        return [task.to_dict() for task in todos]
+        
+    @classmethod
+    def get_by_user_id(cls, user_id):
+        todo = cls.query.filter_by(user_id=user_id).one_or_none()
+        
+        return todo.todict() if todo else None
     
     # def get_by_tag(tag):
     #     tag_todo = Todo.query.filter_by(tag=tag)
@@ -74,3 +89,14 @@ class Todo(db.Model):
     #     done_todo_dictionary = list(map(lambda x: x.to_dict(), done_todo))
     #     return done_todo_dictionary
 
+    def create_todo(self):
+        db.session.add(self)
+        db.session.commit()
+        return self.to_dict() #este es el new_todo del main en la línea 94
+    
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return self.to_dict()
+
+       
