@@ -51,7 +51,7 @@ def get_users_by_email(email):
     user = User.get_by_email(email) 
     
     if user:
-        return jsonify(user), 200
+        return jsonify(user.to_dict()), 200
     return jsonify({'error':'User not found'}), 404
 
 
@@ -123,9 +123,9 @@ def delete_user(email):
     user = User.get_by_email(email) #línea 33 del models
     if user:
         user_delete = user.delete() #el user es el de la línea 118 del main //el delete() es de la línea 43 del models 
-        return jsonify(user_delete), 204
-    else:
-        return 'That username does not exists', 404
+        return jsonify(user_delete.to_dict()), 204
+    
+    return jsonify({'error': 'That username does not exists'}), 404
 
 #-----DELETE de todo filtrando el user_id
 @app.route('/todo/<user_id>', methods=['DELETE'])
@@ -136,6 +136,44 @@ def delete_task(user_id):
         return jsonify(task_delete), 204
     else:
         return 'That username does not exists', 404
+    
+#----------------------PATCH de user 
+@app.route('/user/<old_email>', methods=['PATCH'])
+def edit_mail(old_email):
+    new_email = request.json.get(
+        'email', None
+    )
+
+    if not new_email:
+        return jsonify({'error': 'Missing mail'}), 403
+    
+    user = User.get_by_email(old_email)
+
+    if user:
+        user = user.update_mail(new_email)
+        return jsonify(user), 200
+    
+    return jsonify({'error': 'User not found'}), 404
+
+
+    #-----------------------PATCH de todo
+
+@app.route('/todo/<old_user_id>', methods=['PATCH'])
+def edit_user_id(old_user_id):
+    new_user_id = request.json.get(
+        'user_id', None
+    )
+
+    if not new_user_id:
+        return jsonify({'error': 'Missing user id'}), 403
+    
+    user_id = User.get_by_user_id(old_user_id)
+
+    if user_id:
+        user_id = user_id.update_user_id(new_user_id)
+        return jsonify(user_id), 200
+    
+    return jsonify({'error': 'User id not found'}), 404
 
 
 

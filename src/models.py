@@ -33,17 +33,29 @@ class User(db.Model):
     def get_by_email(cls, email):
         user = cls.query.filter_by(email=email).one_or_none()
     
-        return user.to_dict() if user else None #Si hay un "user" traémelo con diccionario filtrando el email sino devuélveme None
+        return user #Si hay un "user" traémelo con diccionario filtrando el email sino devuélveme None
     
     def create(self):
         db.session.add(self)
         db.session.commit()
         return self.to_dict() #este es el new_user del main en la línea 83
 
+    def update_mail(self, email):
+        self.email = email
+        db.session.commit()
+
+        return self.to_dict()
+    
+    def update(self, email):
+        self.email = email
+        db.session.commit()
+
+        return self.to_dict()
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()
-        return self.to_dict()
+        return self
 
 
 class Todo(db.Model):
@@ -94,6 +106,18 @@ class Todo(db.Model):
         db.session.commit()
         return self.to_dict() #este es el new_todo del main en la línea 94
     
+    def update_user_id(self, user_id):
+        self.user_id= user_id
+        db.session.commit()
+
+        return self.to_dict()
+    
+    def update(self, user_id):
+        self.user_id = user_id
+        db.session.commit()
+
+        return self.to_dict()
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()
